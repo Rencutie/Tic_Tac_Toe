@@ -25,6 +25,8 @@ square_size = height // 3
 bleu_turn = pygame.image.load("morpion/graphics/blue_rectangle.png").convert_alpha()
 bleu_turn = pygame.transform.scale(bleu_turn, (200, 100))
 
+red_turn = pygame.image.load("morpion/graphics/red_rectangle.png").convert_alpha()
+red_turn = pygame.transform.scale(red_turn, (200, 100))
 turn = "red"
 
 
@@ -77,7 +79,13 @@ class Square:
 
 
 def redTurn():
+    red_turn.blit(screen, (650, 100))
+    bleu_turn.blit(screen, (1650, 100))
+
+
+def blueTurn():
     bleu_turn.blit(screen, (650, 100))
+    red_turn.blit(screen, (1650, 100))
 
 
 def isFull():
@@ -128,7 +136,11 @@ while True:
         # background
         screen.fill((255, 255, 255))
         pygame.draw.rect(screen, "silver", tabRect)
-        screen.blit(bleu_turn, (605, 100))
+
+        if turn == "red":
+            redTurn()
+        else:
+            blueTurn()
         # drawing squares
         for square in square_list:
             square.draw(screen)
