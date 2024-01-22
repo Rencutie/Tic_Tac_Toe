@@ -79,13 +79,13 @@ class Square:
 
 
 def redTurn():
-    red_turn.blit(screen, (650, 100))
-    bleu_turn.blit(screen, (1650, 100))
+    screen.blit(red_turn, (610, 100))
+    screen.blit(bleu_turn, (1650, 100))
 
 
 def blueTurn():
-    bleu_turn.blit(screen, (650, 100))
-    red_turn.blit(screen, (1650, 100))
+    screen.blit(bleu_turn, (610, 100))
+    screen.blit(red_turn, (1650, 100))
 
 
 def isFull():
