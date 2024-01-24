@@ -1,44 +1,54 @@
-"""
-    jeu de morpion, option 2 joueurs ou solo vs IA
-    on arrive dans un menue pour choisir quand on lance
-    puis on peut jouer mdr
-    je sais pas si je vais rentrer toutes les possibilité dans l'IA, un peu la flemme
-    peut etre au hasard
-"""
-
 import pygame
 from sys import exit
 
+##########
+
+# defining variables
 width, height = 800, 600
+
+square_size = height // 3
+turn = "red"
+square_list = []
+
+scoreRed = 0
+scoreBlue = 0
+game_active = True
+
 
 pygame.init()
 screen = pygame.display.set_mode((width, height))
+pygame.display.set_caption("tic tac toe")
 Clock = pygame.time.Clock()
-pygame.display.set_caption("morpion")
-game_active = True
+font = pygame.font.Font(None, 36)
 
+# creating tab rectangle on the right
 xPosTabRect, yPosTabRect = 600, 0
 widthTabRect, heightTabRect = 200, 600
 tabRect = pygame.Rect(xPosTabRect, yPosTabRect, widthTabRect, heightTabRect)
 
-square_size = height // 3
-bleu_turn = pygame.image.load("morpion/graphics/blue_rectangle.png").convert_alpha()
+
+##########
+# importing audio files
+bluePlaySound = pygame.mixer.Sound("tic tac toe/audio/playBlue.wav")
+redPlaySound = pygame.mixer.Sound("tic tac toe/audio/playRed.wav")
+winSound = pygame.mixer.Sound("tic tac toe/audio/win.wav")
+drawSound = pygame.mixer.Sound("tic tac toe/audio/draw.wav")
+restartSound = pygame.mixer.Sound("tic tac toe/audio/restart.wav")
+
+##########
+# importing png files :
+bleu_turn = pygame.image.load("tic tac toe/graphics/blue_rectangle.png").convert_alpha()
 bleu_turn = pygame.transform.scale(bleu_turn, (200, 100))
 
-red_turn = pygame.image.load("morpion/graphics/red_rectangle.png").convert_alpha()
+red_turn = pygame.image.load("tic tac toe/graphics/red_rectangle.png").convert_alpha()
 red_turn = pygame.transform.scale(red_turn, (200, 100))
-turn = "red"
 
-scoreRed = 0
-scoreBlue = 0
+red_cross = pygame.image.load("tic tac toe/graphics/red_cross.png").convert_alpha()
+red_cross = pygame.transform.scale(red_cross, (square_size, square_size))
 
-font = pygame.font.Font(None, 36)
-
-bluePlaySound = pygame.mixer.Sound("morpion/audio/playBlue.wav")
-redPlaySound = pygame.mixer.Sound("morpion/audio/playRed.wav")
-winSound = pygame.mixer.Sound("morpion/audio/win.wav")
-drawSound = pygame.mixer.Sound("morpion/audio/draw.wav")
-restartSound = pygame.mixer.Sound("morpion/audio/restart.wav")
+blue_circle = pygame.image.load("tic tac toe/graphics/blue_circle.png").convert_alpha()
+blue_circle = pygame.transform.scale(blue_circle, (square_size, square_size))
+#########
 
 
 class Square:
@@ -64,25 +74,15 @@ class Square:
         if self.color == "neutral":
             pass
         elif self.color == "red":
-            red_cross = pygame.image.load(
-                "morpion/graphics/red_cross.png"
-            ).convert_alpha()
-            red_cross = pygame.transform.scale(red_cross, (square_size, square_size))
             surface.blit(red_cross, (self.xstart, self.ystart))
 
         elif self.color == "blue":
-            blue_circle = pygame.image.load(
-                "morpion/graphics/blue_circle.png"
-            ).convert_alpha()
-            blue_circle = pygame.transform.scale(
-                blue_circle, (square_size, square_size)
-            )
             surface.blit(blue_circle, (self.xstart, self.ystart))
 
     def change_color(self):
         """changes the color of the square depending on whose turn it is."""
         global turn
-        print("is pressed")
+
         if turn == "red" and self.color == "neutral":
             self.color = "red"
             turn = "blue"
@@ -136,7 +136,7 @@ def isFull():
     return True
 
 
-def playerWin():
+def winner():
     """check if player won and return the color
     of the winner if there is one
     """
@@ -164,8 +164,6 @@ def playerWin():
         return "red"
 
 
-square_list = []
-
 for row in range(3):
     row_list = []
     # create all the squares to put them into the list
@@ -175,6 +173,7 @@ for row in range(3):
 
         row_list.append(Square(x, y, row, column))
     square_list.append(row_list)
+
 
 while True:
     for event in pygame.event.get():
@@ -192,7 +191,6 @@ while True:
 
         else:
             if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
-                print("restart")
                 # restarting the game, putting the squares back to neutral
                 for list in square_list:
                     for square in list:
@@ -201,7 +199,7 @@ while True:
                 restartSound.play()
 
     if game_active:
-        # background
+        # drawing background and right tab
         screen.fill((255, 255, 255))
         pygame.draw.rect(screen, "silver", tabRect)
 
@@ -210,16 +208,16 @@ while True:
             for square in list:
                 square.draw(screen)
 
-        if playerWin() == "red":
+        if winner() == "red":
             endScreen()
             scoreRed += 1
-            game_active = False
             winSound.play()
-        elif playerWin() == "blue":
+            game_active = False
+        elif winner() == "blue":
             endScreen()
             scoreBlue += 1
-            game_active = False
             winSound.play()
+            game_active = False
         elif isFull():
             endScreen()
             scoreRed += 0.5
@@ -232,8 +230,6 @@ while True:
             else:
                 blueTurn()
         displayScore()
-
-        # check if all the squares are full and stop the game if they are
 
     pygame.display.update()
     Clock.tick(60)
