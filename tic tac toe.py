@@ -29,24 +29,24 @@ tabRect = pygame.Rect(xPosTabRect, yPosTabRect, widthTabRect, heightTabRect)
 
 ##########
 # importing audio files
-bluePlaySound = pygame.mixer.Sound("tic tac toe/audio/playBlue.wav")
-redPlaySound = pygame.mixer.Sound("tic tac toe/audio/playRed.wav")
-winSound = pygame.mixer.Sound("tic tac toe/audio/win.wav")
-drawSound = pygame.mixer.Sound("tic tac toe/audio/draw.wav")
-restartSound = pygame.mixer.Sound("tic tac toe/audio/restart.wav")
+bluePlaySound = pygame.mixer.Sound("audio/playBlue.wav")
+redPlaySound = pygame.mixer.Sound("audio/playRed.wav")
+winSound = pygame.mixer.Sound("audio/win.wav")
+drawSound = pygame.mixer.Sound("audio/draw.wav")
+restartSound = pygame.mixer.Sound("audio/restart.wav")
 
 ##########
 # importing png files :
-bleu_turn = pygame.image.load("tic tac toe/graphics/blue_rectangle.png").convert_alpha()
+bleu_turn = pygame.image.load("graphics/blue_rectangle.png").convert_alpha()
 bleu_turn = pygame.transform.scale(bleu_turn, (200, 100))
 
-red_turn = pygame.image.load("tic tac toe/graphics/red_rectangle.png").convert_alpha()
+red_turn = pygame.image.load("graphics/red_rectangle.png").convert_alpha()
 red_turn = pygame.transform.scale(red_turn, (200, 100))
 
-red_cross = pygame.image.load("tic tac toe/graphics/red_cross.png").convert_alpha()
+red_cross = pygame.image.load("graphics/red_cross.png").convert_alpha()
 red_cross = pygame.transform.scale(red_cross, (square_size, square_size))
 
-blue_circle = pygame.image.load("tic tac toe/graphics/blue_circle.png").convert_alpha()
+blue_circle = pygame.image.load("graphics/blue_circle.png").convert_alpha()
 blue_circle = pygame.transform.scale(blue_circle, (square_size, square_size))
 #########
 
