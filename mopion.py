@@ -29,6 +29,17 @@ red_turn = pygame.image.load("morpion/graphics/red_rectangle.png").convert_alpha
 red_turn = pygame.transform.scale(red_turn, (200, 100))
 turn = "red"
 
+scoreRed = 0
+scoreBlue = 0
+
+font = pygame.font.Font(None, 36)
+
+bluePlaySound = pygame.mixer.Sound("morpion/audio/playBlue.wav")
+redPlaySound = pygame.mixer.Sound("morpion/audio/playRed.wav")
+winSound = pygame.mixer.Sound("morpion/audio/win.wav")
+drawSound = pygame.mixer.Sound("morpion/audio/draw.wav")
+restartSound = pygame.mixer.Sound("morpion/audio/restart.wav")
+
 
 class Square:
     """
@@ -36,9 +47,11 @@ class Square:
 
     """
 
-    def __init__(self, xstart, ystart, color="neutral"):
+    def __init__(self, xstart, ystart, row, col, color="neutral"):
         self.xstart = xstart
         self.ystart = ystart
+        self.row = row
+        self.col = col
         self.color = color
         self.rect = pygame.Rect(xstart, ystart, square_size, square_size)
 
@@ -73,19 +86,40 @@ class Square:
         if turn == "red" and self.color == "neutral":
             self.color = "red"
             turn = "blue"
+            redPlaySound.play()
         elif turn == "blue" and self.color == "neutral":
             self.color = "blue"
             turn = "red"
+            bluePlaySound.play()
 
 
 def redTurn():
-    screen.blit(red_turn, (610, 100))
+    """show the red rectangle saying red turn"""
+    screen.blit(red_turn, (605, 100))
     screen.blit(bleu_turn, (1650, 100))
 
 
 def blueTurn():
-    screen.blit(bleu_turn, (610, 100))
+    """show the blue rectangle saying blue turn"""
+    screen.blit(bleu_turn, (605, 100))
     screen.blit(red_turn, (1650, 100))
+
+
+def endScreen():
+    endtext = font.render("press space", True, "black")
+    endtext2 = font.render("to restart", True, "black")
+    screen.blit(endtext, (605, 100))
+    screen.blit(endtext2, (605, 130))
+
+
+def displayScore():
+    """display the score on the screen"""
+    scoreText = font.render(f"Score :", True, "black")
+    screen.blit(scoreText, (width - 190, 250))
+    bluescoretext = font.render(f"blue : {scoreBlue}", True, "black")
+    screen.blit(bluescoretext, (width - 190, 280))
+    redscoretext = font.render(f"red : {scoreRed}", True, "black")
+    screen.blit(redscoretext, (width - 190, 310))
 
 
 def isFull():
@@ -95,21 +129,52 @@ def isFull():
         True: every square is full
         False: not every square is full
     """
-    for square in square_list:
-        if square.color == "neutral":
-            return False
+    for list in square_list:
+        for square in list:
+            if square.color == "neutral":
+                return False
     return True
+
+
+def playerWin():
+    """check if player won and return the color
+    of the winner if there is one
+    """
+    for row in range(3):
+        if all(square.color == "blue" for square in square_list[row]):
+            return "blue"
+        elif all(square.color == "red" for square in square_list[row]):
+            return "red"
+
+    # Check columns
+    for col in range(3):
+        if all(square_list[row][col].color == "blue" for row in range(3)):
+            return "blue"
+        elif all(square_list[row][col].color == "red" for row in range(3)):
+            return "red"
+
+    # Check diagonals
+    if all(square_list[i][i].color == "blue" for i in range(3)):
+        return "blue"
+    elif all(square_list[i][3 - i - 1].color == "blue" for i in range(3)):
+        return "blue"
+    elif all(square_list[i][i].color == "red" for i in range(3)):
+        return "red"
+    elif all(square_list[i][3 - i - 1].color == "red" for i in range(3)):
+        return "red"
 
 
 square_list = []
 
 for row in range(3):
+    row_list = []
     # create all the squares to put them into the list
     for column in range(3):
         x = column * square_size
         y = row * square_size
-        square = Square(x, y)
-        square_list.append(square)
+
+        row_list.append(Square(x, y, row, column))
+    square_list.append(row_list)
 
 while True:
     for event in pygame.event.get():
@@ -120,34 +185,55 @@ while True:
         if game_active:
             # check if a square is pressed and change it accordingly
             if event.type == pygame.MOUSEBUTTONDOWN:
-                for square in square_list:
-                    if square.rect.collidepoint(pygame.mouse.get_pos()):
-                        square.change_color()
+                for list in square_list:
+                    for square in list:
+                        if square.rect.collidepoint(pygame.mouse.get_pos()):
+                            square.change_color()
 
         else:
             if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
                 print("restart")
                 # restarting the game, putting the squares back to neutral
-                for square in square_list:
-                    square.color = "neutral"
+                for list in square_list:
+                    for square in list:
+                        square.color = "neutral"
                 game_active = True
+                restartSound.play()
 
     if game_active:
         # background
         screen.fill((255, 255, 255))
         pygame.draw.rect(screen, "silver", tabRect)
 
-        if turn == "red":
-            redTurn()
-        else:
-            blueTurn()
         # drawing squares
-        for square in square_list:
-            square.draw(screen)
+        for list in square_list:
+            for square in list:
+                square.draw(screen)
+
+        if playerWin() == "red":
+            endScreen()
+            scoreRed += 1
+            game_active = False
+            winSound.play()
+        elif playerWin() == "blue":
+            endScreen()
+            scoreBlue += 1
+            game_active = False
+            winSound.play()
+        elif isFull():
+            endScreen()
+            scoreRed += 0.5
+            scoreBlue += 0.5
+            game_active = False
+            drawSound.play()
+        else:
+            if turn == "red":
+                redTurn()
+            else:
+                blueTurn()
+        displayScore()
 
         # check if all the squares are full and stop the game if they are
-        if isFull():
-            game_active = False
 
     pygame.display.update()
     Clock.tick(60)
