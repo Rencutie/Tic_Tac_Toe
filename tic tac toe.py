@@ -2,7 +2,6 @@ import pygame
 from sys import exit
 
 ##########
-
 # defining variables
 width, height = 800, 600
 
@@ -57,11 +56,9 @@ class Square:
 
     """
 
-    def __init__(self, xstart, ystart, row, col, color="neutral"):
+    def __init__(self, xstart, ystart, color="neutral"):
         self.xstart = xstart
         self.ystart = ystart
-        self.row = row
-        self.col = col
         self.color = color
         self.rect = pygame.Rect(xstart, ystart, square_size, square_size)
 
@@ -170,8 +167,7 @@ for row in range(3):
     for column in range(3):
         x = column * square_size
         y = row * square_size
-
-        row_list.append(Square(x, y, row, column))
+        row_list.append(Square(x, y))
     square_list.append(row_list)
 
 
@@ -183,7 +179,7 @@ while True:
 
         if game_active:
             # check if a square is pressed and change it accordingly
-            if event.type == pygame.MOUSEBUTTONDOWN:
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 for list in square_list:
                     for square in list:
                         if square.rect.collidepoint(pygame.mouse.get_pos()):
@@ -220,8 +216,6 @@ while True:
             game_active = False
         elif isFull():
             endScreen()
-            scoreRed += 0.5
-            scoreBlue += 0.5
             game_active = False
             drawSound.play()
         else:
@@ -230,6 +224,5 @@ while True:
             else:
                 blueTurn()
         displayScore()
-
     pygame.display.update()
-    Clock.tick(60)
+    Clock.tick(120)
