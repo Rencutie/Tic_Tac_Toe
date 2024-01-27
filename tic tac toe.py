@@ -124,9 +124,12 @@ def displayScore():
 
 def checkEnd():
     """
-    do the actions and return True if there
-    is a winner or if the board is full
-    else return False
+    check if the game is over and call the
+    right functions if so
+
+    returns :
+    True: game finished
+    False: not finished yet
     """
     if winner() == "red":
         redWin()
@@ -239,9 +242,12 @@ while True:
         for list in square_list:
             for square in list:
                 square.draw(screen)
-        end = not checkEnd()
-        game_active = end
-        if end:
+
+        notEnd = not checkEnd()
+        game_active = notEnd
+
+        # switching turn if game is not over
+        if notEnd:
             if turn == "red":
                 redTurn()
             else:
