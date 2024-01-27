@@ -9,6 +9,7 @@ square_size = height // 3
 turn = "red"
 square_list = []
 
+
 scoreRed = 0
 scoreBlue = 0
 game_active = True
@@ -53,7 +54,6 @@ blue_circle = pygame.transform.scale(blue_circle, (square_size, square_size))
 class Square:
     """
     each square is an object of this class
-
     """
 
     def __init__(self, xstart, ystart, color="neutral"):
@@ -103,6 +103,9 @@ def blueTurn():
 
 
 def endScreen():
+    """show the text saying press space where the turn
+    rectangles are
+    """
     endtext = font.render("press space", True, "black")
     endtext2 = font.render("to restart", True, "black")
     screen.blit(endtext, (605, 100))
@@ -117,6 +120,39 @@ def displayScore():
     screen.blit(bluescoretext, (width - 190, 280))
     redscoretext = font.render(f"red : {scoreRed}", True, "black")
     screen.blit(redscoretext, (width - 190, 310))
+
+
+def checkEnd():
+    """
+    do the actions and return True if there
+    is a winner or if the board is full
+    else return False
+    """
+    if winner() == "red":
+        redWin()
+        return True
+    elif winner() == "blue":
+        blueWin()
+        return True
+    elif isFull():
+        endScreen()
+        drawSound.play()
+        return True
+    return False
+
+
+def redWin():
+    global scoreRed
+    endScreen()
+    scoreRed += 1
+    winSound.play()
+
+
+def blueWin():
+    global scoreBlue
+    endScreen()
+    scoreBlue += 1
+    winSound.play()
 
 
 def isFull():
@@ -203,22 +239,9 @@ while True:
         for list in square_list:
             for square in list:
                 square.draw(screen)
-
-        if winner() == "red":
-            endScreen()
-            scoreRed += 1
-            winSound.play()
-            game_active = False
-        elif winner() == "blue":
-            endScreen()
-            scoreBlue += 1
-            winSound.play()
-            game_active = False
-        elif isFull():
-            endScreen()
-            game_active = False
-            drawSound.play()
-        else:
+        end = not checkEnd()
+        game_active = end
+        if end:
             if turn == "red":
                 redTurn()
             else:
